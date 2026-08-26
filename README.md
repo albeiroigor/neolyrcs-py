@@ -19,7 +19,7 @@ uv sync
 ## Uso
 
 ```bash
-uv run python ui.py
+uv run python tui.py
 ```
 
 La app detecta automáticamente el reproductor activo (Spotify, Chromium, VLC, etc.), busca la letra sincronizada en [lrclib.net](https://lrclib.net) y la muestra en modo karaoke, resaltando la línea actual.
@@ -30,6 +30,7 @@ La app detecta automáticamente el reproductor activo (Spotify, Chromium, VLC, e
 |-------|--------------------|
 | `c`   | Abrir configuración|
 | `q`   | Salir              |
+| `m`   | Busqueda manual    |
 
 ### Configuración
 
@@ -46,4 +47,4 @@ Las letras encontradas se guardan localmente en `~/.cache/neoplug-lyrics-module/
 
 ## Licencia
 
-GPL_V3
+GPL3
