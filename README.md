@@ -1,50 +1,46 @@
-# Neoplug Lyrics
+# neolyrcs-py
 
-Letras sincronizadas (karaoke) en la terminal, detectando automáticamente lo que estés escuchando en Linux.
+Letras sincronizadas (karaoke) en la terminal para Linux.
 
 ## Requisitos
 
 - Python 3.11+
-- [`playerctl`](https://github.com/altdesktop/playerctl) instalado en el sistema (usa MPRIS/D-Bus, solo Linux)
+- [`playerctl`](https://github.com/altdesktop/playerctl)
 - [`uv`](https://docs.astral.sh/uv/) (recomendado) o `pip`
 
 ## Instalación
 
 ```bash
-git clone https://github.com/albeiroigor/neoplug-lyrics.git
-cd neoplug-lyrics
+git clone https://github.com/albeiroigor/neolyrcs-py.git
+cd neolyrcs-py
 uv sync
 ```
 
 ## Uso
 
 ```bash
-uv run python tui.py
+uv run neolyrcs-py
+# o sin instalar el script:
+uv run python -m neolyrcs_py
 ```
 
-La app detecta automáticamente el reproductor activo (Spotify, Chromium, VLC, etc.), busca la letra sincronizada en [lrclib.net](https://lrclib.net) y la muestra en modo karaoke, resaltando la línea actual.
+## Atajos
 
-### Atajos de teclado
+- `c` Configuración
+- `q` Salir
+- `m` Búsqueda manual
 
-| Tecla | Acción             |
-|-------|--------------------|
-| `c`   | Abrir configuración|
-| `q`   | Salir              |
-| `m`   | Busqueda manual    |
+## Configuración
 
-### Configuración
+Ajusta color de acento, líneas visibles y reproductor manual. Guarda con `s`.
 
-Desde el panel (`c`) puedes ajustar:
+## Caché
 
-- Color de acento
-- Cantidad de líneas visibles (3 / 5 / 7)
-- Reproductor manual (en vez de detección automática)
-- presiona tecla (`s`) para guardar
+Las letras se cachean en `~/.cache/neolyrcs-py/` por 15 días.
 
-## Cache de letras
-
-Las letras encontradas se guardan localmente en `~/.cache/neoplug-lyrics-module/` por 15 días, para evitar peticiones repetidas a la API.
+> Si vienes de la versión anterior (`neoplug-lyrics`), su caché en
+> `~/.cache/neoplug-lyrics/` quedó obsoleta y puedes borrarla.
 
 ## Licencia
 
-GPL3
+GPL-3.0

@@ -1,14 +1,17 @@
 [project]
-name = "neoplug-lyrics"
-version = "0.1.0"
-description = "..."
+name = "neolyrcs-py"
+version = "0.2.0"
+description = "Letras sincronizadas (karaoke) en la terminal para Linux."
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["httpx>=0.27", "textual>=0.60",]
 
+[project.scripts]
+neolyrcs-py = "neolyrcs_py.tui:main"
+
 [tool.hatch.build.targets.wheel]
-include = ["core.py", "ui.py", "windows.py", "styles.tcss"]
+packages = ["neolyrcs_py"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
