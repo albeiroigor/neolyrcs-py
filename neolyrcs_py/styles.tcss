@@ -3,7 +3,7 @@ $text-light: #f5f5f7;
 $text-dim: #2f94d8;
 
 /* ---------------------------------------------------------------- */
-/* Pantalla principal (ui.py: LyricsApp)                             */
+/* Pantalla principal (tui.py: LyricsApp)                            */
 /* ---------------------------------------------------------------- */
 
 Screen {
@@ -104,11 +104,7 @@ Select {
     margin-bottom: 1;
 }
 
-/* Usado por el hint de LyricsApp y por el de ambos modales. Es el mismo
- *   id repetido en pantallas distintas: funciona porque nunca hay dos
- *   pantallas montadas al mismo tiempo, pero si en el futuro se vuelve
- *   confuso, lo mas prolijo seria pasarlo a una clase ".hint". */
-#hint {
-color: $text-dim;
-text-style: italic;
+.hint {
+    color: $text-dim;
+    text-style: italic;
 }

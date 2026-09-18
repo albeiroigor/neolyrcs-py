@@ -5,7 +5,7 @@ from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Select, Static, Input
 
-from core import list_players
+from neolyrcs_py.core import list_players, clear_title
 
 ACCENT_COLORS = [
     ("Rojo", "#cf0000"),
@@ -21,7 +21,6 @@ LINE_OPTIONS = [3, 5, 7]
 AUTO_PLAYER = "__auto__"
 
 
-# Seccion de configuracion
 class ConfigScreen(ModalScreen):
     BINDINGS = [
         Binding("s", "save", "Guardar"),
@@ -41,12 +40,6 @@ class ConfigScreen(ModalScreen):
         lines_options = [(str(n), n) for n in LINE_OPTIONS]
         player_options = [("Auto (detectar)", AUTO_PLAYER)] + [(p, p) for p in players]
 
-        # Un Select con allow_blank=False exige que "value" sea una de las
-        # opciones listadas, o revienta al construirse. current_lines siempre
-        # deberia venir de LINE_OPTIONS, pero lo validamos igual por si el
-        # llamador pasa algo distinto. current_player puede referirse a un
-        # reproductor que ya no esta corriendo (list_players() no lo va a
-        # incluir), en ese caso caemos de vuelta a "Auto" en vez de crashear.
         safe_lines = self.current_lines if self.current_lines in LINE_OPTIONS else LINE_OPTIONS[0]
         safe_player = self.current_player if self.current_player in players else AUTO_PLAYER
 
@@ -75,7 +68,7 @@ class ConfigScreen(ModalScreen):
                 allow_blank=False,
             )
 
-            yield Static("[dim]Presiona [b]s[/b] para guardar[/dim]", id="hint")
+            yield Static("[dim]Presiona [b]s[/b] para guardar[/dim]", classes="hint")
 
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.select.id != "accent_select":
@@ -111,14 +104,16 @@ class ManualLyricsScreen(ModalScreen):
             yield Input(value=self.current_artist, id="artist_input")
             yield Static("Titulo")
             yield Input(value=self.current_title, id="title_input")
-            yield Static("[dim]Presiona [b]Enter[/b] para buscar[/dim]", id="hint")
+            yield Static("[dim]Presiona [b]Enter[/b] para buscar[/dim]", classes="hint")
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         artist = self.query_one("#artist_input", Input).value.strip()
         title = self.query_one("#title_input", Input).value.strip()
         if not artist or not title:
             return
-        self.dismiss({"artist": artist, "title": title})
+        # Limpiar el título para mejorar la búsqueda
+        clean_title = clear_title(title)
+        self.dismiss({"artist": artist, "title": clean_title})
 
     def action_cancel(self) -> None:
         self.dismiss(None)

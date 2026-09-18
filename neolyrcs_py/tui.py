@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 from textual import events
 from textual.app import App, ComposeResult
@@ -8,19 +9,19 @@ from textual.containers import Vertical
 from textual.widgets import ProgressBar, Static
 from textual import work
 
-from core import (
+from neolyrcs_py.core import (
     clear_title,
     fetch_lyrics,
+    find_current_line,
     get_active_player,
     get_cached_lyrics,
-    get_current_line,
     get_current_song,
     get_duration,
     get_position,
     parse_lrc,
     save_to_cache,
 )
-from windows import ConfigScreen, ManualLyricsScreen
+from neolyrcs_py.windows import ConfigScreen, ManualLyricsScreen
 
 # --- Configuracion por defecto ---------------------------------------------
 DEFAULT_ACCENT = "#ffffff"
@@ -62,7 +63,8 @@ SEARCH_PULSE_HALF_CYCLE = 0.6  # segundos por medio ciclo (subir o bajar)
 
 # Logica de interfaz
 class LyricsApp(App):
-    CSS_PATH = "styles.tcss"
+    TITLE = "neolyrcs-py"
+    CSS_PATH = str(Path(__file__).parent / "styles.tcss")
     BINDINGS = [
         Binding("q", "quit", "Salir"),
         Binding("c", "open_config", "Config"),
@@ -86,6 +88,9 @@ class LyricsApp(App):
 
         # Estado de la letra
         self.current_lyrics: list[tuple[float, str]] = []
+        # Timestamps precalculados: find_current_line los reutiliza en cada
+        # tick de posicion sin reconstruir la lista (era O(n) por tick).
+        self._lyric_times: list[float] = []
         self.has_synced_lyrics: bool = False
         self.last_line_index: int = -1
         self._search_pulse_worker = None
@@ -210,6 +215,7 @@ class LyricsApp(App):
         self.last_song = song
         self.last_line_index = -1
         self.current_lyrics = []
+        self._lyric_times = []
         self.has_synced_lyrics = False
 
         artist, title = song.split("|", 1)
@@ -248,7 +254,7 @@ class LyricsApp(App):
         if not self.has_synced_lyrics or not self.current_lyrics or position is None:
             return
 
-        idx = get_current_line(self.current_lyrics, position)
+        idx = find_current_line(self._lyric_times, position)
         if idx == self.last_line_index:
             return
         self.last_line_index = idx
@@ -312,6 +318,7 @@ class LyricsApp(App):
 
         if not lyrics_data:
             self.current_lyrics = []
+            self._lyric_times = []
             self.has_synced_lyrics = False
             self.lyrics_widget.update(TEXT_NOT_FOUND)
             return
@@ -319,11 +326,13 @@ class LyricsApp(App):
         synced_lyrics = lyrics_data.get("syncedLyrics")
         if synced_lyrics:
             self.current_lyrics = parse_lrc(synced_lyrics)
+            self._lyric_times = [t for t, _ in self.current_lyrics]
             self.has_synced_lyrics = True
         else:
             self.has_synced_lyrics = False
             plain = lyrics_data.get("plainLyrics")
             self.current_lyrics = [(0.0, line) for line in plain.split("\n")] if plain else []
+            self._lyric_times = [t for t, _ in self.current_lyrics]
 
         self.last_line_index = -1
         self.update_display(center_index=None)
@@ -390,5 +399,9 @@ class LyricsApp(App):
             await asyncio.sleep(FLASH_STEP_DELAY)
 
 
-if __name__ == "__main__":
+def main() -> None:
     LyricsApp().run()
+
+
+if __name__ == "__main__":
+    main()
